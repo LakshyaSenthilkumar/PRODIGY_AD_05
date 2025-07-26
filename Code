@@ -1,0 +1,141 @@
+#HTML Code
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>QR Code Scanner</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 QR Code Scanner</h1>
+    <div id="reader"></div>
+    <div id="result" class="result">Scan a QR code to see the result here</div>
+    <button onclick="resetScanner()">🔁 Scan Again</button>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
+
+
+
+
+#CSS Code
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(to right, #8360c3, #2ebf91);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .container {
+    text-align: center;
+    padding: 30px;
+    border-radius: 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+  
+  h1 {
+    margin-bottom: 20px;
+  }
+  
+  #reader {
+    width: 300px;
+    margin: auto;
+  }
+  
+  .result {
+    margin-top: 20px;
+    font-size: 1.2em;
+    word-wrap: break-word;
+  }
+  
+  button {
+    background: #ff4081;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 20px;
+    font-size: 16px;
+  }
+  
+  button:hover {
+    background-color: #e91e63;
+  }
+  
+  .link-btn {
+    display: inline-block;
+    margin-top: 15px;
+    background: #00e6ac;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+  }
+  .link-btn:hover {
+    background: #00b38f;
+  }
+
+
+
+
+#JavaScript Code
+
+const resultBox = document.getElementById("result");
+let html5QrCode;
+
+function startScanner() {
+  html5QrCode = new Html5Qrcode("reader");
+
+  html5QrCode.start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: 250 },
+    qrCodeMessage => {
+      html5QrCode.stop(); // Stop scanner after reading
+      displayResult(qrCodeMessage);
+    },
+    errorMessage => {
+      // Ignore scanning errors
+    }
+  ).catch(err => {
+    resultBox.innerHTML = `❌ Error: ${err}`;
+  });
+}
+
+function displayResult(msg) {
+  resultBox.innerHTML = `📦 <strong>Scanned:</strong> ${msg}`;
+
+  // If it's a URL, add clickable link
+  if (isValidURL(msg)) {
+    resultBox.innerHTML += `<br><a href="${msg}" target="_blank" class="link-btn">🌐 Open Link</a>`;
+  }
+}
+
+function isValidURL(str) {
+  try {
+    new URL(str);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function resetScanner() {
+  resultBox.innerHTML = "Scan a QR code to see the result here";
+  startScanner();
+}
+
+startScanner();
